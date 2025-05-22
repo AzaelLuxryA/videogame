@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="fleshymap p1"/>
+	<classpathentry kind="src" path="fleshymap p2"/>
+	<classpathentry kind="src" path="fleshy tiles"/>
+	<classpathentry kind="src" path="Hero"/>
+	<classpathentry kind="src" path="idle-unharm"/>
+	<classpathentry kind="src" path="orc-animation"/>
+	<classpathentry kind="src" path="SandyRoom"/>
+	<classpathentry kind="src" path="slime-animation"/>
+	<classpathentry kind="src" path="walk-unarm"/>
+	<classpathentry kind="src" path="Walls"/>
+	<classpathentry kind="src" path="attack-direction"/>
+	<classpathentry kind="src" path="maincharacter"/>
+	<classpathentry kind="src" path="maps"/>
+	<classpathentry kind="src" path="tilemap"/>
+	<classpathentry kind="src" path="corpse"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

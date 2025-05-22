@@ -1,0 +1,252 @@
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+public class TileMapEditor extends AppletNullLayout implements Runnable
+{
+	//------------------------------------------------------------------------//
+	
+	TileMap    tilemap = new TileMap("tilemap1.map.txt", 32);
+
+	Image      offscreen;
+	Graphics   offscreen_g;
+	
+	TilePanel  tilePN;
+	MapPanel   mapPN;
+	
+	Label      fileLB = new Label("Tile Map Filename");
+	TextField  fileTF = new TextField();
+	Button     loadBN = new Button("Load");
+	Button     saveBN = new Button("Save");
+
+	Label      rowsLB = new Label("Rows");
+	Label      colsLB = new Label("Columns");
+	TextField  rowsTF = new TextField();
+	TextField  colsTF = new TextField();
+	Button     newBN  = new Button("New");
+	Button     expBN  = new Button("Expand");
+	
+	Label      tileLB = new Label("Tile Image Filenames");
+	List       tileLT = new List();
+	
+	Button     removeBN = new Button("Remove Selected Tile");
+	
+	Button     addBN    = new Button("Add Tile in Selected Slot");
+	
+	Label      bgrdLB = new Label("Background Image");
+	TextField  bgrdTF = new TextField();
+	
+	//------------------------------------------------------------------------//
+	
+	public void init()
+	{
+   	setLayout(null);
+		
+		setBackground(Color.LIGHT_GRAY);
+
+		offscreen   = createImage(1920, 1080);
+		offscreen_g = offscreen.getGraphics();
+		
+		tilePN = new TilePanel(this, 64+8);
+		mapPN  = new MapPanel (this, 32);
+		
+		add(mapPN );
+		add(tilePN);		
+
+		add(fileLB,  10, 500, 220, 20);
+		add(fileTF,  10, 520, 220, 20);
+		add(loadBN,  10, 550, 100, 20, new LoadListener());
+		add(saveBN, 130, 550, 100, 20, new SaveListener());
+
+		add(rowsLB,  10, 600, 100, 20);
+		add(colsLB, 130, 600, 100, 20);
+		add(rowsTF,  10, 620, 100, 20);
+		add(colsTF, 130, 620, 100, 20);
+		add(newBN,   10, 650, 100, 20, new NewListener());
+		//add(expBN,  130, 650, 100, 20);// expBN does do anything yet
+		
+		add(tileLB, 300, 500, 150, 20);
+		add(tileLT, 300, 520, 300, 150);
+		
+		add(removeBN, 450, 500, 150, 20, new RemoveTileListener());
+		
+		add(addBN,    300, 670, 300, 20, new AddTileListener()); 
+		
+		add(bgrdLB, 300, 700, 300, 20);
+		add(bgrdTF, 300, 720, 300, 20, new BackgroundListener());
+		
+		
+		
+		populateGUI();
+		
+		
+		Thread t = new Thread(this);
+		
+		t.start();
+	}
+	
+	//------------------------------------------------------------------------//
+
+	public void populateGUI()
+	{
+		fileTF.setText(tilemap.filename);
+		
+	   rowsTF.setText("" + tilemap.map.length);
+	   colsTF.setText("" + tilemap.map[0].length());
+	   
+	   for(int i = 0; i < tilemap.tile_name.length; i++)
+	   	
+	      tileLT.add(tilemap.tile_name[i]);
+	   
+	   bgrdTF.setText(tilemap.background_name);
+	}
+	
+	//------------------------------------------------------------------------//
+
+	public class LoadListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			String filename = fileTF.getText();
+			
+			tilemap.loadMap(filename);
+			
+			populateGUI();
+			
+			repaint();
+		}
+	}
+	
+	//------------------------------------------------------------------------//
+
+	public class SaveListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			String filename = fileTF.getText();
+			
+			tilemap.saveMap(filename);
+		}
+	}
+
+	//------------------------------------------------------------------------//
+
+	public class NewListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			int rows = Integer.parseInt(rowsTF.getText());
+			int cols = Integer.parseInt(colsTF.getText());
+			
+			tilemap.create(rows, cols);
+			
+			repaint();
+		}
+	}
+
+	//------------------------------------------------------------------------//
+
+	public class RemoveTileListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+         removeSelectedTileFromList();
+         
+         updateTiles();
+		   
+		   repaint();
+		}
+		
+		public void removeSelectedTileFromList()
+		{
+			tileLT.remove(tileLT.getSelectedIndex());			
+		}
+	}
+
+	//------------------------------------------------------------------------//
+	
+	public class AddTileListener implements ActionListener
+	{
+	   public void actionPerformed(ActionEvent e)
+	   {
+         addTileToSelectedSlot();
+         
+         updateTiles();
+		   
+		   repaint();
+	   }
+	   
+	   public void addTileToSelectedSlot()
+	   {
+	   	Frame parent = new Frame();
+	      FileDialog fd = new FileDialog(parent);
+	      //fd.setMultipleMode(true);
+	      fd.setVisible(true);
+	      
+	      String filename = fd.getFile();
+	      int    index    = tileLT.getSelectedIndex(); 
+	      
+	      tileLT.add(filename, index); 
+	      
+	      fd.setVisible(false);  
+	   }
+	   
+	}
+	
+	//------------------------------------------------------------------------//
+
+	public void updateTiles()
+	{
+		int n = tileLT.getItemCount();
+		
+		tilemap.tile_name = new String[n];
+		tilemap.tile      = new Image[n];
+			
+		for(int i = 0;  i < n; i++)
+		{	
+		  	tilemap.tile_name[i] = tileLT.getItem(i);
+		  
+		  	tilemap.tile[i] = tilemap.getImage(tilemap.tile_name[i]);
+		}
+	}
+	
+	//------------------------------------------------------------------------//
+
+   public class BackgroundListener implements ActionListener
+   {
+      public void actionPerformed(ActionEvent e)
+      {
+         tilemap.background_name = bgrdTF.getText();
+         
+         tilemap.background = tilemap.getImage(tilemap.background_name);
+         
+         repaint();
+      }
+   }
+   
+	//------------------------------------------------------------------------//
+		
+   public void repaint()
+   {
+   	super.repaint();
+		mapPN.repaint();
+      tilePN.repaint();
+   }
+   
+	//------------------------------------------------------------------------//
+	// Setup a delay so that images are loaded and displayed by repaint       //
+	//------------------------------------------------------------------------//
+
+   public void run()
+   {
+   	try
+   	{
+   		Thread.sleep(250);
+   	}
+   	catch(InterruptedException x) {}
+   	
+   	repaint();
+   }
+	
+}

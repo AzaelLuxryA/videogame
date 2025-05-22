@@ -1,0 +1,53 @@
+import java.awt.*;
+
+public class Rect
+{
+	//------------------------------------------------------------------------//
+	
+   int x;
+	int y;
+	
+	int w;
+	int h;
+	
+	Color color;
+	
+	//------------------------------------------------------------------------//
+	
+	public Rect(int x, int y, int w, int h, Color color)
+	{
+      setLocation(x, y);
+      
+      setSize(w, h);
+      
+      this.color = color;
+	}
+	
+	//------------------------------------------------------------------------//
+	
+	public void setLocation(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	//------------------------------------------------------------------------//
+	
+	public void setSize(int w, int h)
+	{
+		this.w = w;
+		this.h = h;
+	}
+	
+	//------------------------------------------------------------------------//
+	
+	public void draw(Graphics g)
+	{
+		g.setColor(color);
+		
+		g.drawRect(x, y, w, h);
+	}
+
+	//------------------------------------------------------------------------//
+	
+}
