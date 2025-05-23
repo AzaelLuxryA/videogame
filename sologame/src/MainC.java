@@ -122,7 +122,7 @@ public class MainC extends Entity {
 		roamingSpace.draw(g);
 	}
 	
-	private void updateHitbox() {
+	void updateHitbox() {
 		hitbox.setPosition(x + hitBoxx,y +  hitBoxy);
 	}
 

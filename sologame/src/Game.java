@@ -11,8 +11,10 @@ import javax.imageio.ImageIO;
 public class Game extends GameApplet {
     // Create the main character sprite at position (100,100) with a size of 150x150 pixels
 	Sound corpseSound = new Sound("corpse_sound.wav");
-    Maincharacter mainC = new Maincharacter(100, 100, 64, 64, 100);
+	Sound caveSound = new Sound("backgroundmusic.wav");
+    Maincharacter mainC = new Maincharacter(100, 100, 128, 128, 100);
     Slime enemy = new Slime(400,250,128,128,3);
+    Slime enemy2 = new Slime(400,250,128,128,3);
     Corpse corpse = new Corpse(enemy.x, enemy.y, enemy.w, enemy.h, corpseSound);
     //Orc enemy2 = new Orc(300,200,128,128,8);
     Slime minion;
@@ -41,9 +43,9 @@ public class Game extends GameApplet {
         }
     
         // Create RoomTwo instance and pass the main character and enemy as parameters
-        room1 = new RoomOne();
-        room2 = new RoomTwo();
-        room3 = new RoomThree();
+        room1 = new RoomOne(mainC);
+        room2 = new RoomTwo(mainC);
+        room3 = new RoomThree(mainC);
         currentRoom = room1;
         
         currentRoom.addEntity(enemy);
@@ -52,19 +54,22 @@ public class Game extends GameApplet {
         // Set default animation to idle for the main character
         mainC.setAnimation("idle");
         corpse.setAnimation("idle");
- 
+        caveSound.play();
+		//room2.addEntity(enemy2);
+		
+		
     }
 
     @Override
     public void gameLoop() {
 
-        
     	overlay.update();
     	int[] newPos = mainC.updateAnimation(keys);
 //    	System.out.println(enemy.random);
 //    	System.out.println("sprite x and y is " + mainC.x + " " +mainC.y);
 //    	System.out.println("enemy hitbox is " + mainC.getHitBoxx() + " " + mainC.getHitBoxy());
-    	enemy.move(mainC);
+    	//enemy.move(mainC);
+    	//enemy2.move(mainC);
     	//enemy2.move(mainC);
     	//if(minion != null) {
     	//	minion.move(mainC);
@@ -88,7 +93,7 @@ public class Game extends GameApplet {
         
         pPressedLastFrame = keys[KeyEvent.VK_P];
 //        System.out.println("remaining Health" + mainC.getHP());
-        System.out.println("remainig entities" + room1.getEntities().size());
+        System.out.println("remainig entities" + room2.getEntities().size());
 //        System.out.println("main x = " + mainC.x + "main y = " + mainC.y );
         
        
@@ -96,10 +101,10 @@ public class Game extends GameApplet {
         if (currentRoom.canMoveTo(mainC, newPos[0], newPos[1])) {
             mainC.setPosition(newPos[0], newPos[1]);
         }
+        
         if (enemy.getHP() == 0 && !enemy.isCorpseMade()) {
             corpse.x = enemy.x;
             corpse.y = enemy.y;
-            corpse.updateHitbox(enemy.x, enemy.y);
             //corpse.setImage(buffer);
             currentRoom.addEntity(corpse);
             enemy.markCorpseMade();
@@ -112,6 +117,8 @@ public class Game extends GameApplet {
         currentRoom.removeDeadEntity();
         
         
+        
+        
         //if(room1.IsRoomOver()) { 
 //        	if(mainC.x > 849 && mainC.y > 688) {
 //        	currentRoom = room3; 
@@ -122,21 +129,65 @@ public class Game extends GameApplet {
        // }
         
         if(currentRoom instanceof RoomOne) {
-        	if(room1.getDoor(0).overlap(mainC)) {
+        	if(room1.getDoor(0).overlap(mainC) && room1.getEntities().size()==1) {
         		currentRoom = room2;
         		
         		mainC.setPosition(100, 100);
+        		currentRoom.removeEntity(mainC);
         		currentRoom.addEntity(mainC);
-        }
+        		currentRoom.addEntity(enemy2);
+        		enemy2.avoid();
+        		enemy2.setAnimation("idle");
+        		
+        		
+        	}
+        	
        }
         
+        
         if(currentRoom instanceof RoomTwo) {
-        	if(mainC.x >= 1104 && mainC.y >= 608) {
+        	//currentRoom.addEntity(enemy2);
+        	//enemy2.move(mainC);
+        	
+        	if(room2.getDoor(0).overlap(mainC) & room2.getEntities().size()==1) {
         		currentRoom = room3;
         		mainC.setPosition(100, 100);
         		currentRoom.addEntity(mainC);
+        		
         	}
+        	
+ 
+        	
         }
+        for (Entity e : currentRoom.getEntities()) {
+            if (e instanceof Maincharacter) {
+                ((Maincharacter) e).updateAnimation(keys); 
+                ((Maincharacter) e).attack(currentRoom); // ✅ This is required
+            } else {
+                e.update(); // whatever your enemy or NPC update logic is
+            }
+        }
+        
+        for (Entity e : currentRoom.getEntities()) {
+            // Skip the player
+
+            int oldX = e.x;
+            int oldY = e.y;
+
+            if (e instanceof Orc) {
+                ((Orc) e).move(mainC);
+            } else if (e instanceof Slime) {
+            	//System.out.println("slimeismoving");
+                ((Slime) e).move(mainC);
+                e.updateHitbox();
+            }
+           	
+            if (!currentRoom.canMoveTo(e, e.x, e.y)) {
+                e.setPosition(oldX, oldY); // Undo move if collision
+                e.updateHitbox();
+            }
+        }
+        
       
         
         for (Entity e : currentRoom.getEntities()) {
@@ -147,9 +198,7 @@ public class Game extends GameApplet {
         if (mainC.isAttacking()) {
             for (int i = 0; i < currentRoom.getEntities().size(); i++) {
                 Entity e = currentRoom.getEntities().get(i);
-                if (e.isEnemy() && 
-                    Math.abs(mainC.x - e.x) < 50 && 
-                    Math.abs(mainC.y - e.y) < 50) {
+                if (e.isEnemy() && e.overlap(mainC.getAttackHitbox())){
                     e.registerHit();
                     
                 }

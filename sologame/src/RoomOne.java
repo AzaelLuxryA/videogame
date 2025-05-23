@@ -8,13 +8,14 @@ public class RoomOne extends RoomBase {
     // Parameters:
     // - mainSprite: The main character that will be placed in the room
     // - v1, v2: Enemy objects that exist outside this class and will be placed in the room
-    public RoomOne() {
+	Maincharacter mc;
+    public RoomOne(Maincharacter mc) {
         
     	// Call the parent constructor (RoomBase), setting up the tile map
         // "map1.map" is the file name for the room's layout, and 40 is the tile size
-        super("room1.txt", 40);
+        super("room1.txt", 40,mc);
         
-        addDoor(new Rect(50,50,32,32, Color.red));
+        addDoor(new Rect(440,20,32,32, null));
 
         // Assign the enemies passed from outside this class to local variables
    

@@ -6,12 +6,12 @@ public class RoomTwo extends RoomBase {
     // Parameters:
     // - mainSprite: The main character that will be placed in the room
     // - v1, v2: Enemy objects that exist outside this class and will be placed in the room
-    public RoomTwo() {
+    public RoomTwo(Maincharacter mc) {
         
     	// Call the parent constructor (RoomBase), setting up the tile map
         // "map1.map" is the file name for the room's layout, and 40 is the tile size
-        super("map2.map", 40);
-
+        super("roomtwo.txt", 40,mc);
+        addDoor(new Rect(950,250,32,32,null));
       
 
         // Add the main character to the room so it can be tracked and updated

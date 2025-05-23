@@ -20,7 +20,7 @@ String directions[] = {"up","down","right","left"};
 int randomDirection = (int)(Math.random()*3);
 int directionTimer = 0;
 int hitBoxx, hitBoxy;
-
+private boolean isAvoiding;
 int chasingHBw,chasingHBh,chasingx,chasingy;
 //private int max = 100;
 //private int maxy = 100;
@@ -44,11 +44,11 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 		int roamHeight = h * 3;
 		int roamX = x + w / 2 - roamWidth / 2;
 		int roamY = y + h / 2 - roamHeight / 2;
-
+		isAvoiding = false;
 		roamingSpace = new Rect(roamX, roamY, roamWidth, roamHeight, null);
 		
-		chasingHBw = (int)(w*1.4);
-		chasingHBh = (int)(h*1.4);
+		chasingHBw = (int)(w*3);
+		chasingHBh = (int)(h*3);
 		chasingx = (w - chasingHBw)/2;
 		chasingy = (h - chasingHBh)/2;
 		
@@ -98,7 +98,9 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 	}
 	
 	public void takeDamage(int damage) {
+		
 		this.hp -= damage;
+		
 		if(hp <0) hp = 0;
 		
 	}
@@ -129,7 +131,22 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 	}
 	public void move(Maincharacter mainc) {
 		
-			if(this.chasingHitBox.overlap(mainc.hitbox)) {
+			if(isAvoiding) {
+				
+				int oldx = x;
+				int oldy = y;
+				Slime.super.avoid(mainc.hitbox);
+				if (x > oldx ) {
+					setAnimation("slime_rtw");
+				} else if (x < oldx) {
+					setAnimation("slime_lfw");
+				} else if (y > oldy) {
+					setAnimation("slime_dnw");
+				} else if (y < oldy) {
+					setAnimation("slime_upw");
+				}
+				updateHitbox();
+			} else if(this.chasingHitBox.overlap(mainc.hitbox)) {
 				int oldx = x;
 				int oldy = y;
 				Slime.super.chase(mainc.hitbox);
@@ -143,7 +160,7 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 					setAnimation("slime_upw");
 				}
 				updateHitbox();
-			}
+			}/*
 			else if(this.hitbox.overlap(mainc.hitbox)) {
 				int oldx = x;
 				int oldy = y;
@@ -158,7 +175,7 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 					setAnimation("slime_upw");
 				}
 				updateHitbox();
-			}
+			}*/
 			else if(this.hitbox.overlap(roamingSpace)==false) {
 				int oldx = x;
 				int oldy = y;
@@ -248,6 +265,9 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 			
 			
 	}
+	public void avoid() {
+		isAvoiding = true;
+	}
 	
 	public void setHitbox(int offsetX, int offsetY, int width, int height) {
 	        this.hitbox = new Rect(x + offsetX, y + offsetY, width, height,null);
@@ -258,9 +278,17 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 	public int getHitBoxy() {
 		return hitbox.y;
 	}
-	private void updateHitbox() {
+	@Override void updateHitbox() {
 		hitbox.setPosition(x + hitBoxx,y +  hitBoxy);
 		chasingHitBox.setPosition(x + chasingx, y +chasingy);
+	}
+	
+	public int getx() {
+		return this.x;
+		
+	}
+	public int gety() {
+		return this.y;
 	}
 	@Override
 	public boolean isEnemy() {
@@ -275,6 +303,15 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 		roamingSpace.draw(g);
 	}
 	@Override
+	public void update() {
+		updateHitbox();
+	}
+	@Override
+	public Rect getHitBox() {
+		updateHitbox();
+		return hitbox;
+	}
+	@Override
 	public void drawchasingHitBox(Graphics g) {
 		chasingHitBox.draw(g);
 	}
@@ -282,5 +319,6 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 	public void setPosition(int x, int y) {
 		super.setPosition(x , y );
 	}
+	
 	
 }

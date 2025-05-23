@@ -9,6 +9,7 @@ public class Entity extends Sprite{
 	private Rect hitbox;
 	int hitBoxx,hitBoxy;
 	private boolean corpseMade = false;
+	private int chasingx,chasingy;
 	
 	public Entity(int x, int y, int w, int h, int hp) {
 		super(x, y, w, h);
@@ -30,7 +31,9 @@ public class Entity extends Sprite{
 		// TODO Auto-generated method stub
 		
 	}
-	
+	public Rect getHitBox() {
+		return hitbox;
+	}
 	
 	public int getHP() {
 		return hp;
@@ -61,9 +64,7 @@ public class Entity extends Sprite{
 	public void setPosition(int x, int y) {
 		super.setPosition(x, y);
 	}
-	private void updateHitbox() {
-		hitbox.setPosition(x + hitBoxx, y + hitBoxy);
-	}
+	
 	
 	
 	public Entity getEntity() {
@@ -80,6 +81,9 @@ public class Entity extends Sprite{
 	public void resetHitTracking() { // NEW: Call this when attack ends
 	        wasHitThisAttack = false;
 	    }
+	void updateHitbox() {
+
+	}
 	    
 	public boolean shouldRemove() {
 	        return timesHit >= 3;

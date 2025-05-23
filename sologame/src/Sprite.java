@@ -88,6 +88,10 @@ public class Sprite extends Rect {
     public boolean isEnemy() {
     	return false;
     }
+    
+    private void updateHitbox() {
+		
+	}
     public void drawHitBox(Graphics g) {
 		hitbox.draw(g);
 	}

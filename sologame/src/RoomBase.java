@@ -8,6 +8,7 @@ public class RoomBase {
     protected TileMap tileMap;
     protected ArrayList<Entity> entities = new ArrayList<>();
     protected ArrayList<Rect> doors = new ArrayList<>();
+    protected Maincharacter mc;
    // protected ArrayList<Entity> enemies = new ArrayList<>();
 
     /**
@@ -16,9 +17,10 @@ public class RoomBase {
      * @param mapFilename The file containing the map data.
      * @param tileSize    The size (in pixels) of each tile.
      */
-    public RoomBase(String mapFilename, int tileSize) {
+    public RoomBase(String mapFilename, int tileSize, Maincharacter mc) {
         // TileMap2 reads the map data from a file and loads the assets internally.
         tileMap = new TileMap(mapFilename, tileSize);
+        this.mc = mc;
     }
 
     /**
@@ -48,6 +50,7 @@ public class RoomBase {
     	
         tileMap.draw(g);
         drawDoors(g);
+        mc.drawAttackBox(g, null);
         
         for (Entity sprite : entities) {
         	g.setColor(Color.black);
@@ -237,6 +240,15 @@ public class RoomBase {
      */
     public ArrayList<Entity> getEntities() {
         return entities;
+    }
+    public void removeEntity(Entity entity) {
+    	Iterator<Entity> it = entities.iterator();
+    	while (it.hasNext()) {
+    		Entity e = it.next();
+    		if (e.equals(entity)) {
+    			it.remove();
+    		}
+    	}
     }
     
     public void removeDeadEntity() {

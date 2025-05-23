@@ -20,7 +20,7 @@ public class GameApplet extends Applet implements Runnable, KeyListener {
    
 
     public void init() {
-        setSize(1200, 800);
+        setSize(1000, 550);
         
         buffer = createImage(getWidth(), getHeight());
         bufferGraphics = buffer.getGraphics();

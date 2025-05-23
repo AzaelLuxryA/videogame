@@ -272,7 +272,7 @@ int chasingHBw,chasingHBh,chasingx,chasingy;
 	public int getHitBoxy() {
 		return hitbox.y;
 	}
-	private void updateHitbox() {
+	void updateHitbox() {
 		hitbox.setPosition(x + hitBoxx,y +  hitBoxy);
 		chasingHitBox.setPosition(x + chasingx, y +chasingy);
 	}

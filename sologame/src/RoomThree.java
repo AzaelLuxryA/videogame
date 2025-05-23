@@ -2,9 +2,9 @@
 import java.awt.Graphics;
 
 public class RoomThree extends RoomBase {
-    public RoomThree() {
+    public RoomThree(Maincharacter mc) {
     	// "map3.map" is the file name for the room's layout, and 40 is the tile size
-        super("map3.map", 40);
+        super("map3.map", 40,mc);
 	}
 
 	// Declare enemy objects that will be added to the room
